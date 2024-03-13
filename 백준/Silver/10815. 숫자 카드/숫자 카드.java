@@ -1,66 +1,54 @@
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
-import java.util.StringTokenizer;
 import java.util.Arrays;
+import java.util.Scanner;
 
- public class Main {
-
-	 private static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-	 private static final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-	 static int N, M;
-	 static int getNum[];
+public class Main {
 	
-	public static void main(String[] args) throws IOException {
-        
-		StringTokenizer st ;
+	static int[] getCard;
+	static int checkValue ;
+	
+	public static void main(String[] args) {
 		
-		// 가지고 있는 숫자카드 배열에 집어넣기 
-		N = Integer.parseInt(br.readLine());
-		st = new StringTokenizer(br.readLine());
+		Scanner sc = new Scanner(System.in) ;
 		
-		getNum = new int [N] ;
-		for (int i=0; i<getNum.length; i++) {
-			getNum[i] = Integer.parseInt(st.nextToken());
+		int n = sc.nextInt();			// 상근이가 가지고 있는 숫자 카드의 개수
+		getCard = new int [n];			// 상근이가 가지고 있는 숫자 카드 배열
+		
+		for(int i=0; i<getCard.length; i++) {
+			getCard[i] = sc.nextInt();
 		}
 		
-		// 가지고 있는 숫자 카드를 오름차순으로 정렬 
-		Arrays.sort(getNum);
+		Arrays.sort(getCard); 			// getCard 배열 정렬
 		
-		M = Integer.parseInt(br.readLine());
-		st = new StringTokenizer(br.readLine());
+		int m = sc.nextInt();			// 판별해야 되는 숫자의 개수
+		StringBuffer sb = new StringBuffer();		// -> 계속된 시간초과로 인해 사용..
 		
-		for (int i=0; i<M; i++) {
-			int searchNum = Integer.parseInt(st.nextToken());
+		for(int i=0; i<m; i++) {
+			checkValue = sc.nextInt();
 			
-			// 이분 탐색을 해서 해당 숫자가 있는 경우
-            if(binarySearch(searchNum)) bw.write("1 ");
-            // 이분 탐색을 해서 해당 숫자가 없는 경우
-            else bw.write("0 ");
-			
+			int answer = binarySearch(0, getCard.length-1) ;
+			sb.append(answer+" ") ;
 		}
 		
-		bw.close();
-		br.close();
+		System.out.println(sb);
 		
+		sc.close();
 	}
 	
-	private static boolean binarySearch (int searchNum) {
-		int leftIndex = 0;
-		int rightIndex = getNum.length -1 ;
-
-    	while(leftIndex <= rightIndex){
-    		int midIndex = (leftIndex + rightIndex) / 2;
-    		int mid = getNum[midIndex];
-
-    		if(mid < searchNum) leftIndex = midIndex + 1;
-    		else if(mid > searchNum) rightIndex = midIndex - 1;
-    		else return true;
-    	}
-    	
-    	return false;
+	public static int binarySearch(int left, int right) {
+		// 재귀함수보다는 반복문이 더 빠르기 때문에 while문으로 수정
+		while (left <= right) {
+			int mid = (right + left) / 2 ;		// 중간값을 설정
+			
+			if (getCard[mid] == checkValue) {
+				return 1 ;		// checkValue가 중간값과 같으면 메소드 종료 
+			} else if (getCard[mid] > checkValue) {
+				right = mid - 1;	// checkValue가 중간값보다 왼쪽에 있으면 right 변수값을 수정
+			} else {
+				left = mid + 1 ;	// checkValue가 중간값보다 오른쪽에 있으면 left 변수값을 수정
+			}
+		}
+		
+		return 0 ;		// while문이 종료되었음에도 값을 찾지 못했다면 상근이가 가지고 있지 않은 숫자
 	}
-	
+
 }
