@@ -1,47 +1,42 @@
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
-
-import java.util.StringTokenizer;
-import java.util.HashSet;
-import java.util.List ;
-import java.util.ArrayList ;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Scanner;
 
- public class Main {
-
-	public static void main(String[] args) throws IOException {
+public class Main {
+	
+	public static void main(String[] args) {
 		
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		Scanner sc = new Scanner(System.in) ;
 		
-		int n = Integer.parseInt(br.readLine());
-		HashSet<String> entrySet = new HashSet<>();
+		int n = sc.nextInt();	// 로그에 기록된 출입 기록의 수
+		HashSet<String> enterHash = new HashSet<String>() ;	// 현재 회사에 있는 사람을 기록하는 리스트
 		
-		for (int i=0; i<n; i++) {
+		for(int i=0; i<n; i++) {
+			String name = sc.next();		// 사람 이름
+			String status = sc.next();		// enter or leave 
 			
-			StringTokenizer st = new StringTokenizer(br.readLine());
-			String name = st.nextToken() ;
-			String entry = st.nextToken() ;
-			
-			if (entry.equals("enter")) entrySet.add(name) ;
-			else if (entry.equals("leave")) {
-				if (entrySet.contains(name)) entrySet.remove(name);
+			if (status.equals("enter")) {
+				enterHash.add(name) ;		// 들어오면 enterHash에 추가
+			} else {
+				enterHash.remove(name) ;	// 퇴근하면 enterHash에서 제거
 			}
-			
 		}
 		
-		List<String> entryList = new ArrayList<>(entrySet);
-		Collections.sort(entryList, Collections.reverseOrder() );
+		// 리스트로 옮기기
+		List<String> enterList = new ArrayList<>(enterHash) ;
 		
-		for (int i=0; i<entryList.size(); i++) {
-			bw.write(entryList.get(i)+"\n");
+		// 사전순으로 정렬
+		Collections.sort(enterList);
+		
+		// 출력
+		for(int i=enterList.size()-1; i>=0; i--) {
+			System.out.println(enterList.get(i));
 		}
 		
-		bw.close();
-		br.close();
+		sc.close();
 		
 	}
+
 }
