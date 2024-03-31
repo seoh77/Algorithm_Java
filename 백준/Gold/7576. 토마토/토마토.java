@@ -48,14 +48,11 @@ public class Main {
 		int[] dr = {-1, 1, 0, 0} ;
 		int[] dc = {0, 0, -1, 1} ;
 		
-		while(!queue.isEmpty()) {
+		while(!queue.isEmpty() && cnt != total) {
 			// 큐에서 익은 토마토 위치 꺼내기
 			Coord coord = queue.poll() ;
 			int r = coord.r ;
 			int c = coord.c ;
-			
-			// arr[r][c]-1의 값으로 day 값 갱신 (처음 익은 토마토의 값이 1이기 때문에 -1)
-			day = arr[r][c] - 1 ;
 			
 			// 익은 토마토와 인접한 위치의 안 익은 토마토 상태변경
 			for(int d=0; d<4; d++) {
@@ -71,6 +68,9 @@ public class Main {
 				arr[nr][nc] = arr[r][c] + 1 ;		// arr[r][c]의 값에 +1을 해서 arr[nr][nc]에 저장
 				cnt++ ;								// 익은 토마토 개수 +1
 				queue.add(new Coord (nr, nc)) ;		// 새롭게 익은 토마토 큐에 넣기
+
+				// arr[nr][nc]-1의 값으로 day 값 갱신 (처음 익은 토마토의 값이 1이기 때문에 -1)
+				day = arr[nr][nc] - 1 ;
 			}
 		}
 		
@@ -79,6 +79,7 @@ public class Main {
 			day = -1 ;
 		}
 		
+        // 출력 
 		System.out.println(day);
 		
 		sc.close();
