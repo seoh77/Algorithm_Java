@@ -42,6 +42,7 @@ public class Main {
 		while(curTime < T) {
 			curTime++ ;			// 시간 추가
 			
+			// 원본 복사
 			for(int r=0; r<R; r++) {
 				for(int c=0; c<C; c++) {
 					copyRoom[r][c] = room[r][c] ;
@@ -74,9 +75,10 @@ public class Main {
 			for(int c=0; c<C; c++) {
 				// 미세먼지가 있는 칸이라면
 				if(room[r][c] > 0) {
-					int spreadAmount = room[r][c] / 5 ;
-					int spreadTotal = 0 ;
+					int spreadAmount = room[r][c] / 5 ;		// 확산되는 양
+					int spreadTotal = 0 ;					// 총 확산된 양
 					
+					// 인접한 네 방향으로 확산
 					for(int d=0; d<4; d++) {
 						int nr = r + dr[d] ;
 						int nc = c + dc[d] ;
@@ -87,12 +89,15 @@ public class Main {
 						// 공기청정기가 있는 칸으로는 확산이 일어나지 않음
 						if((nr == acTop && nc == 0) || (nr == acTop+1 && nc == 0)) continue ;
 						
+						// 확산됨
 						copyRoom[nr][nc] += spreadAmount ;
 						spreadTotal += spreadAmount ;
 					}
 					
+					// 남은 미세먼지 양
 					copyRoom[r][c] -= spreadTotal ;
 					
+					// 남은 미세먼지 양이 음수가 나올 순 없음
 					if (copyRoom[r][c] < 0) {
 						copyRoom[r][c] = 0 ;
 					}
@@ -126,20 +131,19 @@ public class Main {
 		room[r][c] = 0 ;	// 바로 옆이 공기청정기 이므로 넘어오는 값이 없음
 		
 		while(true) {
-			
 			int nr = r + windR[d] ;
 			int nc = c + windC[d] ;
 			
-			// 한바퀴 돌았음
+			// 한바퀴 돌았음 -> 공기청정기로 들어간 미세먼지는 정화되므로 그냥 값이 사라짐
 			if(nr == acTop && nc == 0) break ;
 			
+			// 끝 지점에 닿을 때마다 d 인덱스 이동
 			if(nc >= C || nr < 0 || nc < 0 || nr > acTop) {
 				d++ ;
 				continue ;
 			}
 			
 			room[nr][nc] = copyRoom[r][c] ;
-			
 			r = nr ; c = nc ;
 		}
 		
@@ -154,9 +158,10 @@ public class Main {
 			int nr = r + windR[d] ;
 			int nc = c + windC[d] ;
 			
-			// 한바퀴 돌았음
+			// 한바퀴 돌았음 -> 공기청정기로 들어간 미세먼지는 정화되므로 그냥 값이 사라짐
 			if(nr == acTop+1 && nc == 0) break ;
 			
+			// 끝 지점에 닿을 때마다 d 인덱스 이동
 			if(nc >= C || nr >= R || nc < 0 || nr < acTop) {
 				d++ ;
 				continue ;
@@ -165,16 +170,6 @@ public class Main {
 			room[nr][nc] = copyRoom[r][c] ;
 			r = nr ; c = nc ;
 		}
-		
-		clean() ;
-	}
-
-	/** 
-	 * 공기청정기로 들어간 미세먼지는 모두 정화
-	 */
-	private static void clean() {
-		room[acTop][0] = 0 ;
-		room[acTop+1][0] = 0 ;
 	}
 
 }
