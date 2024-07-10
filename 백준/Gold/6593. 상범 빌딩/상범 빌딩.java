@@ -1,78 +1,101 @@
-// 인터넷에서 풀이 그대로 가져온 것 (다시 풀어야 함)
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.StringTokenizer;
+import java.util.Scanner;
 
 public class Main {
 	
-	static int l,r,c;
-	static char[][][] map;
-	static StringBuilder sb = new StringBuilder();
-	static int[] dx= {-1,1,0,0,0,0};
-	static int[] dy = {0,0,-1,1,0,0};
-	static int[] dz = {0,0,0,0,1,-1};
-	public static void main(String[] args) throws IOException{
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st;
-		while(true) {
-			st = new StringTokenizer(br.readLine());
-			l = Integer.parseInt(st.nextToken());
-			r = Integer.parseInt(st.nextToken());
-			c = Integer.parseInt(st.nextToken());
-			if(l ==0 && r==0 && c==0) {
-				System.out.println(sb.toString());
-				return;
-			}
-			
-			int sx=0,sy=0,sz=0;
-			map =new char[l][r][c];
-			for(int i=0; i<l; i++) {
-				for(int j=0; j<r; j++) {
-					String line = br.readLine();
-					for(int k=0; k<c; k++) {
-						map[i][j][k] = line.charAt(k);
-						if(map[i][j][k] == 'S') {
-							sx =k; sy = j; sz =i;
-							map[i][j][k] = '.';
-						}
-					}
-				}
-				br.readLine();
-			}
-			bfs(sx, sy, sz);
+	static class Path {
+		int l, r, c;
+		
+		Path(int l, int r, int c) {
+			this.l = l;
+			this.r = r;
+			this.c = c;
 		}
 	}
 	
-	static void bfs(int x, int y, int z) {
-		Queue<int[]> q = new LinkedList<>();
-		boolean[][][] check = new boolean[l][r][c];
-		q.add(new int[] {x,y,z,0});
-		check[z][y][x] = true;
+	public static void main(String[] args) {
 		
-		while(!q.isEmpty()) {
-			int[] p = q.poll();
-			int px=p[0], py=p[1], pz=p[2];
-			int move = p[3];
+		Scanner sc = new Scanner(System.in);
+		
+		while(true) {
+			int l = sc.nextInt();		// 상범 빌딩의 층 수
+			int r = sc.nextInt();		// 상범 빌딩의 한 층의 행 개수
+			int c = sc.nextInt();		// 상범 빌딩의 한 층의 열 개수
 			
-			if(map[pz][py][px]=='E') {
-				sb.append("Escaped in " + move+" minute(s).\n");
-				return;
+			// 반복문 종료 조건
+			if(l == 0 && r == 0 && c == 0) break;
+			
+			String[][][] building = new String [l][r][c];	// 빌딩 정보 입력
+			int[][][] visited = new int [l][r][c];			// 방문체크 및 걸린 시간을 저장하는 배열
+			
+			Path start = null;	// BFS 시작지점
+			Path end = null;	// BFS 종료지점
+			
+			for(int i=0; i<l; i++) {
+				for(int j=0; j<r; j++) {
+					String[] temp = sc.next().split("");
+					for(int z=0; z<c; z++) {
+						building[i][j][z] = temp[z];
+						
+						// 시작지점 저장
+						if(temp[z].equals("S")) {
+							start = new Path(i, j, z);
+							visited[i][j][z] = 1;
+						} else if(temp[z].equals("E")) {
+							end = new Path(i, j, z);
+						}
+					}
+				}
+				
+				sc.nextLine();
+				
 			}
 			
-			for(int d=0; d<6; d++) {
-				int nx = px + dx[d], ny = py + dy[d], nz = pz + dz[d];
-				if(nx <0 || ny <0 || nz<0 || nx>c-1 || ny>r-1 || nz >l-1) continue;
-				if(check[nz][ny][nx]) continue;
-				if(map[nz][ny][nx]=='.' || map[nz][ny][nx]=='E') {
-					check[nz][ny][nx] = true;
-					q.add(new int[] {nx, ny, nz, move+1});
+			// 델타배열
+			int[] dc = {0, 0, 0, 0, -1, 1};
+			int[] dr = {0, 0, -1, 1, 0, 0};
+			int[] dl = {-1, 1, 0, 0, 0, 0};
+			
+			// BFS 탐색
+			Queue<Path> queue = new LinkedList<Path>();		// 큐 생성
+			queue.add(start);
+			
+			while(!queue.isEmpty()) {
+				Path path = queue.poll();
+				
+				// 종료조건
+				if(path.l == end.l && path.r == end.r && path.c == end.c) {
+					System.out.printf("Escaped in %d minute(s).\n", visited[path.l][path.r][path.c]-1);
+					break;
+				}
+				
+				// 델타탐색
+				for(int d=0; d<6; d++) {
+					int nl = path.l + dl[d];
+					int nr = path.r + dr[d];
+					int nc = path.c + dc[d];
+					
+					// 범위 초과
+					if(nl < 0 || nl >= l || nr < 0 || nr >= r || nc < 0 || nc >= c) continue;
+					
+					// 이미 방문했던 위치 or 막혀있는 곳이라면 pass
+					if(visited[nl][nr][nc] != 0 || building[nl][nr][nc].equals("#")) continue;
+					
+					visited[nl][nr][nc] = visited[path.l][path.r][path.c] + 1;
+					queue.add(new Path(nl, nr, nc));
 				}
 			}
+			
+			// 탈출에 성공하지 못한 경우
+			if(visited[end.l][end.r][end.c] == 0) {
+				System.out.println("Trapped!");
+			}
+			
 		}
-		sb.append("Trapped!\n");
+		
+		sc.close();
+		
 	}
+
 }
